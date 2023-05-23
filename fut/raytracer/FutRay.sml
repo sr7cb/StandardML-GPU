@@ -11,6 +11,7 @@ struct
 
   type i64 = Int64.int
   type i32 = Int32.int
+  type device = i64
 
   type prepared_scene = MLton.Pointer.t
 
@@ -23,7 +24,7 @@ struct
   type render_package = MLton.Pointer.t
 
   val render_spawn =
-    _import "render_spawn" public : fut_context * prepared_scene * i64 * i64 * ( i32 array ) -> render_package;
+    _import "render_spawn" public : fut_context * device * prepared_scene * i64 * i64 * ( i32 array ) -> render_package;
 
   val render_poll = _import "render_poll" public : fut_context -> Word8.word;
 
@@ -34,8 +35,8 @@ struct
     let
       val (data, start, len) = ArraySlice.base output
 
-      fun spawn () =
-        render_spawn (ctx, prepared_scene, start, len, data)
+      fun spawn device =
+        render_spawn (ctx, device, prepared_scene, start, len, data)
       fun poll x =
         (render_poll x = 0w1)
       fun finish x = render_finish x
